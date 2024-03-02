@@ -15,7 +15,7 @@
 // ##################################################################################
 
 // Only define one driver, the other ones must be commented out
-#define ILI9341_DRIVER
+//#define ILI9341_DRIVER
 //#define ST7735_DRIVER
 //#define ILI9163_DRIVER
 //#define S6D02A1_DRIVER
@@ -24,7 +24,7 @@
 //#define ILI9481_DRIVER
 //#define ILI9486_DRIVER
 //#define ILI9488_DRIVER
-//#define ST7789_DRIVER // Define the screen size below for this display
+#define ST7789_DRIVER // Define the screen size below for this display
 //#define R61581_DRIVER
 
 // Some displays support SPI reads via the MISO pin, if the display has a single
@@ -42,7 +42,8 @@
 // For ST7789, ST7735 and ILI9163 ONLY, define the pixel width and height in portrait orientation
 // #define TFT_WIDTH  80
 // #define TFT_WIDTH  128
-// #define TFT_WIDTH  240 // ST7789 240 x 240 and 240 x 320
+#define TFT_WIDTH  240 // ST7789 240 x 240 and 240 x 320
+#define TFT_HEIGHT 135
 // #define TFT_HEIGHT 160
 // #define TFT_HEIGHT 128
 // #define TFT_HEIGHT 240 // ST7789 240 x 240
@@ -138,27 +139,27 @@
 // For ESP32 Dev board (only tested with ILI9341 display)
 // The hardware SPI can be mapped to any pins
 
-#define TFT_MISO 19
-#define TFT_MOSI 23
-#define TFT_SCLK 18
-#define TFT_CS   15  // Chip select control pin
-#define TFT_DC    2  // Data Command control pin
-#define TFT_RST   4  // Reset pin (could connect to RST pin)
+//#define TFT_MISO 19
+//#define TFT_MOSI 23
+//#define TFT_SCLK 18
+//#define TFT_CS   15  // Chip select control pin
+//#define TFT_DC    2  // Data Command control pin
+//#define TFT_RST   4  // Reset pin (could connect to RST pin)
 //#define TFT_RST  -1  // Set TFT_RST to -1 if display RESET is connected to ESP32 board RST
 //#define TFT_BL   32  // LED back-light (only for ST7789 with backlight control pin)
 
-#define TOUCH_CS 21     // Chip select pin (T_CS) of touch screen
+//#define TOUCH_CS 21     // Chip select pin (T_CS) of touch screen
 
 //#define TFT_WR 22    // Write strobe for modified Raspberry Pi TFT only
 
 // For the M5Stack module use these #define lines
 //#define TFT_MISO 19
-//#define TFT_MOSI 23
-//#define TFT_SCLK 18
-//#define TFT_CS   14  // Chip select control pin
-//#define TFT_DC   27  // Data Command control pin
-//#define TFT_RST  33  // Reset pin (could connect to Arduino RESET pin)
-//#define TFT_BL   32  // LED back-light (required for M5Stack)
+#define TFT_MOSI 11
+#define TFT_SCLK 12
+//#define TFT_CS   10  // Chip select control pin
+#define TFT_DC   8  // Data Command control pin
+#define TFT_RST  9  // Reset pin (could connect to Arduino RESET pin)
+#define TFT_BL   7  // LED back-light (required for M5Stack)
 
 // ######       EDIT THE PINs BELOW TO SUIT YOUR ESP32 PARALLEL TFT SETUP        ######
 
@@ -173,8 +174,8 @@
 //#define ESP32_PARALLEL
 
 // The ESP32 and TFT the pins used for testing are:
-//#define TFT_CS   33  // Chip select control pin (library pulls permanently low
-//#define TFT_DC   15  // Data Command control pin - use a pin in the range 0-31
+//#define TFT_CS   10  // Chip select control pin (library pulls permanently low
+//#define TFT_DC   8  // Data Command control pin - use a pin in the range 0-31
 //#define TFT_RST  32  // Reset pin, toggles on startup
 
 //#define TFT_WR    4  // Write strobe control pin - use a pin in the range 0-31
@@ -248,11 +249,11 @@
 // With an ILI9163 display 27 MHz works OK.
 // The RPi typically only works at 20MHz maximum.
 
-// #define SPI_FREQUENCY   1000000
+ #define SPI_FREQUENCY   1000000
 // #define SPI_FREQUENCY   5000000
 // #define SPI_FREQUENCY  10000000
 // #define SPI_FREQUENCY  20000000
-#define SPI_FREQUENCY  27000000 // Actually sets it to 26.67MHz = 80/3
+//#define SPI_FREQUENCY  27000000 // Actually sets it to 26.67MHz = 80/3
 // #define SPI_FREQUENCY  40000000 // Maximum to use SPIFFS
 // #define SPI_FREQUENCY  80000000
 
