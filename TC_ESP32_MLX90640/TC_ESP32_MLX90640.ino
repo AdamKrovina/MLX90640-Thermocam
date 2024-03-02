@@ -64,8 +64,8 @@ int x, y, i, j;
 static float tempValues[32*24];
 
 // Output size
-#define O_WIDTH 224
-#define O_HEIGHT 168
+#define O_WIDTH 240
+#define O_HEIGHT 135
 #define O_RATIO O_WIDTH/32
 
 float **interpolated = NULL;
@@ -76,7 +76,7 @@ void setup() {
   Serial.println("Hello.");
 
   // Connect thermal sensor.
-  Wire.begin();
+  Wire.begin(16,17,400000);
   Wire.setClock(400000); // Increase I2C clock speed to 400kHz
   Wire.beginTransmission((uint8_t)MLX90640_address);
   if (Wire.endTransmission() != 0) {
@@ -120,7 +120,7 @@ void setup() {
   setAbcd();
   drawLegend();
 }
-
+Ahoj Markus!
 
 void loop() {
   tempTime = millis();
