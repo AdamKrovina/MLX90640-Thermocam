@@ -30,9 +30,6 @@
 #define C_DKGREY Display.color565(80,80,80)
 #define C_GREY Display.color565(127,127,127)
 
-#define min(a,b) ((a)<(b)?(a):(b))
-#define max(a,b) ((a)>(b)?(a):(b))
-
 const byte MLX90640_address = 0x33; //Default 7-bit unshifted address of the MLX90640
 #define TA_SHIFT 8 //Default shift for MLX90640 in open air
 paramsMLX90640 mlx90640;
@@ -61,12 +58,12 @@ int x, y, i, j;
 
 
 // array for the 32 x 24 measured tempValues
-static float tempValues[32*24];
+
+float tempValues[32*24];
 
 // Output size
-#define O_WIDTH 240
-#define O_HEIGHT 135
-#define O_RATIO O_WIDTH/32
+#define O_WIDTH 135
+#define O_HEIGHT 240
 
 float **interpolated = NULL;
 uint16_t *imageData = NULL;
@@ -102,7 +99,7 @@ void setup() {
   SPI.begin();
   SPI.setFrequency(80000000L);
   Display.begin();
-  //Display.setRotation(3);
+  Display.setRotation(3);
   Display.fillScreen(C_BLACK);
 
 
@@ -118,15 +115,31 @@ void setup() {
   // get the cutoff points for the color interpolation routines
   // note this function called when the temp scale is changed
   setAbcd();
-  drawLegend();
+
+  Display.drawLine(0, 0, 0, 134, TFT_YELLOW);  // zlta ciara os Y x=0
+  Display.drawLine(0, 0, 239, 0, TFT_PINK);    // ruzova ciara os X y=0
 }
-Ahoj Markus!
+
 
 void loop() {
+  /*
+  while(Serial.available() == 0);
+  while(Serial.available() > 0){
+    Serial.read();
+  }
+  */
+  
   tempTime = millis();
   
   readTempValues();
   setTempScale();
+
+  // zero the center temps
+  /*tempValues[383 - 16] = 0;
+  tempValues[383 - 15] = 0;
+  tempValues[384 + 15] = 0;
+  tempValues[384 + 16] = 0;
+  */
   drawPicture();
   drawMeasurement();
 }
@@ -182,6 +195,7 @@ float lerp(float v0, float v1, float t) {
 
 
 void drawPicture() {
+
   if (INTERPOLATE) {
     interpolate();
     for (y=0; y<O_HEIGHT; y++) {
@@ -194,7 +208,10 @@ void drawPicture() {
   else {
     for (y=0; y<24; y++) {
       for (x=0; x<32; x++) {
-        Display.fillRect(8 + x*7, 8 + y*7, 7, 7, getColor(tempValues[(31-x) + (y*32)]));
+        //Display.fillRect(8 + x*7, 8 + y*7, 7, 7, getColor(tempValues[(31-x) + (y*32)]));
+        
+        Display.fillRect(8 + x*5, 8 + y*5, 5, 5, getColor(tempValues[(31-x) + (y*32)]));
+
       }
     }
   }
@@ -245,16 +262,43 @@ uint16_t getColor(float val) {
 
 
 void setTempScale() {
-  minTemp = 255;
-  maxTemp = 0;
+  float lmin = 2000;
+  float lmax = -200;
+  //Serial.println();
+  //Serial.println();
+  for (y=0; y<24; y++) {
+    for (x=0; x<32; x++) {
 
-  for (i = 0; i < 768; i++) {
-    minTemp = min(minTemp, tempValues[i]);
-    maxTemp = max(maxTemp, tempValues[i]);
+      lmin = min(lmin, tempValues[(31-x) + (y*32)]);
+      lmax = max(lmax, tempValues[(31-x) + (y*32)]);
+      //Serial.print(tempValues[(31-x) + (y*32)], 0);
+      //delay(12);
+      //Serial.print(",");
+      
+    }
+    //Serial.println();
   }
+  //Serial.println();
+  maxTemp = lmax;
+  minTemp = lmin;
+
+  //Serial.print("max min: ");
+  //Serial.print(lmax);
+  //Serial.print(", ");
+  //Serial.print(lmin);
 
   setAbcd();
-  drawLegend();
+  
+  Display.setTextFont(2);
+  Display.setTextSize(1);
+
+  Display.setCursor(180, 0);
+  Display.setTextColor(TFT_WHITE, TFT_BLACK);
+  Display.print(String(maxTemp).substring(0, 5));
+
+  Display.setCursor(180, 20);
+  Display.setTextColor(TFT_WHITE, TFT_BLACK);
+  Display.print(String(minTemp).substring(0, 5));
 }
 
 
@@ -266,40 +310,17 @@ void setAbcd() {
   d = minTemp + (maxTemp - minTemp) * 0.8182;
 }
 
-
-// Draw a legend.
-void drawLegend() {
-  float inc = (maxTemp - minTemp) / 224.0;
-  j = 0;
-  for (ii = minTemp; ii < maxTemp; ii += inc) {
-    Display.drawFastVLine(8+ + j++, 292, 20, getColor(ii));
-  }
-
-  Display.setTextFont(2);
-  Display.setTextSize(1);
-  Display.setCursor(8, 272);
-  Display.setTextColor(TFT_WHITE, TFT_BLACK);
-  Display.print(String(minTemp).substring(0, 5));
-
-  Display.setCursor(192, 272);
-  Display.setTextColor(TFT_WHITE, TFT_BLACK);
-  Display.print(String(maxTemp).substring(0, 5));
-
-  Display.setTextFont(NULL);
-}
-
-
 // Draw a circle + measured value.
 void drawMeasurement() {
 
   // Mark center measurement
-  Display.drawCircle(120, 8+84, 3, TFT_WHITE);
-
+  Display.drawCircle(6+16*5, 7+12*5, 3, TFT_WHITE);
+  Display.drawCircle(0, 0, 5, TFT_RED);
   // Measure and print center temperature
   centerTemp = (tempValues[383 - 16] + tempValues[383 - 15] + tempValues[384 + 15] + tempValues[384 + 16]) / 4;
-  Display.setCursor(86, 214);
+  Display.setCursor(180, 40);
   Display.setTextColor(TFT_WHITE, TFT_BLACK);
   Display.setTextFont(2);
-  Display.setTextSize(2);
+  Display.setTextSize(1);
   Display.print(String(centerTemp).substring(0, 5) + " °C");
 }
